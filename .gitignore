@@ -3,5 +3,5 @@
 build/*
 lib/*
 
-*_demoC
+examples/*_demoC
 *.out
