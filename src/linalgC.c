@@ -44,7 +44,7 @@ int lu_decompose(MatrixC* A, MatrixC** L_out, MatrixC** U_out, MatrixC** P_out) 
             }
         }
         if (max_val < EPS) {
-            printf("WARNING: the matrix is bizzare, cannot do decomposition.\n");
+            printf("WARNING: the matrix is bizarre, cannot do decomposition.\n");
             matrix_destroy(L);
             matrix_destroy(U);
             matrix_destroy(P);

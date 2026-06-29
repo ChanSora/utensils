@@ -19,6 +19,9 @@ LIB_OBJS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(LIB_SRCS))
 LIB_NAME = mathlib.a
 LIB_TARGET = $(LIB_DIR)/$(LIB_NAME)
 
+# $(info LIB_SRCS = $(LIB_SRCS))   # 加在 LIB_SRCS 定义后面
+# $(info LIB_OBJS = $(LIB_OBJS))   # 加在 LIB_OBJS 定义后面
+
 # 测试和示例
 TEST_SRCS = $(wildcard $(TEST_DIR)/*.c)
 EXAMPLE_SRCS = $(wildcard $(EXAMPLE_DIR)/*.c)
@@ -26,15 +29,16 @@ EXAMPLE_SRCS = $(wildcard $(EXAMPLE_DIR)/*.c)
 # 默认目标：编译库 + 示例程序
 all: $(LIB_TARGET) examples
 
+# 编译 .o 文件（这个规则是完整的，保留不动）
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE_DIR)/%.h
+	mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # 编译库（修复后的规则）
 $(LIB_TARGET): $(LIB_OBJS)
 	mkdir -p $(LIB_DIR)
 	$(AR) $(ARFLAGS) $@ $^
 
-# 编译 .o 文件（这个规则是完整的，保留不动）
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE_DIR)/matrix.h
-	mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
 
 # 编译示例程序
 examples: $(LIB_TARGET)
