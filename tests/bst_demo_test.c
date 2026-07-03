@@ -353,14 +353,21 @@ int avl_find_rank(AVLTree* tree, int val) {
     // avl_delete(tree, val);
     // return res;
 }
+void print(Node* root) {
+    if (!root) return;
+    if (root->height == 0) return;
+    print(root->left);
+    printf("%d\n", root->val);
+    print(root->right);
+}
 
 int main() {
-    // freopen("P3369_9.in", "r", stdin);
-    // freopen("my_P3369_9.out", "w", stdout);
+    freopen("P3369_9.in", "r", stdin);
+    freopen("my_P3369_9.out", "w", stdout);
     int n;
     scanf("%d", &n);
     AVLTree* tree = avl_create_tree(n);
-    for (int i = 1, opt, x; i <= n; i++) {
+    for (int i = 1, opt, x; i <= 36; i++) {
         scanf("%d%d", &opt, &x);
         // printf("---");
         switch (opt) {
@@ -376,20 +383,21 @@ int main() {
             break;
         case 4:
             // printf("the %dth number: %d.\n", x, avl_find_kth_val(tree, x));
-            printf("%d\n", avl_find_kth_val(tree, x));
+            // printf("%d\n", avl_find_kth_val(tree, x));
             break;
         case 5:
             // printf("predecessor of %d: %d.\n", x, avl_find_predecessor_val(tree, x));
-            printf("%d\n", avl_find_predecessor_val(tree, x));
+            // printf("%d\n", avl_find_predecessor_val(tree, x));
             break;
         case 6:
             // printf("successor of %d: %d.\n", x, avl_find_successor_val(tree, x));
-            printf("%d\n", avl_find_successor_val(tree, x));
+            // printf("%d\n", avl_find_successor_val(tree, x));
             break;
         default:
             break;
         }
     }
+    print(tree->root);
     avl_destroy_tree(tree);
     return 0;
 }

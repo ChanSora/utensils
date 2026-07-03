@@ -102,14 +102,14 @@ void print(int x) {
     if (t[x].s[1]) print(t[x].s[1]);
 }
 int main() {
-    // freopen("P3369_9.in", "r", stdin);
-    // freopen("check_P3369_9.out", "w", stdout);
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(0);
+    freopen("P3369_9.in", "r", stdin);
+    freopen("check_P3369_9_37.out", "w", stdout);
+    // std::ios::sync_with_stdio(false);
+    // std::cin.tie(0);
     
     int n; std::cin >> n;
     insert(inf); insert(-inf);
-    for (int i = 1; i <= n; i++) {
+    for (int i = 1; i <= 37; i++) {
         int opt, x; std::cin >> opt >> x;
         if (opt == 1) insert(x);
         else if (opt == 2) del(x);

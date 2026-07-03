@@ -10,8 +10,7 @@
 // ==================== 核心：LU 分解（带列主元） ====================
 // 输入：A（方阵，会被拷贝到 U 中，原矩阵保持不变）
 // 输出：L, U, P 满足 P * A = L * U
-
-int lu_decompose(MatrixC* A, MatrixC** L_out, MatrixC** U_out, MatrixC** P_out) {
+int _lu_decompose(MatrixC* A, MatrixC** L_out, MatrixC** U_out, MatrixC** P_out) {
     int n = A->rows;
     if (A->cols != n) {
         printf("ERROR: LU decomposition is only for square matrices.\n");
@@ -74,6 +73,83 @@ int lu_decompose(MatrixC* A, MatrixC** L_out, MatrixC** U_out, MatrixC** P_out) 
         }
     }
     for (int i = 0; i < L->rows; i++) L->data[Lrow[i] * L->cols + i] = 1.0;
+    *L_out = L;
+    *U_out = U;
+    *P_out = P;
+    return 1;
+}
+
+int lu_decompose(MatrixC* A, MatrixC** L_out, MatrixC** U_out, MatrixC** P_out) {
+    // 这个版本的lu分解支持了任意矩阵。
+    if (!A) return 0;
+    int n = A->rows, m = A->cols;
+    
+    // 1. 分配 L, U, P 矩阵
+    MatrixC* L = matrix_create(n, n);
+    MatrixC* U = matrix_copy(A);
+    MatrixC* P = matrix_create(n, n);
+    matrix_identity(P);
+    
+    int *Urow = U->row_order;
+    int *Lrow = L->row_order;
+    int *Prow = P->row_order;
+
+    // 2. LU 分解主循环
+    for (int i = 0; i < n; i++) {
+        // 2.1 列主元查找
+        int pivot = i, offset = 0;
+        double max_val = fabs(U->data[Urow[i] * U->cols + i]);
+
+        while (i + offset < m) {
+            for (int j = i + 1; j < n; j++) {
+                double val = fabs(U->data[Urow[j] * U->cols + i + offset]);
+                if (val > max_val) {
+                    max_val = val;
+                    pivot = j;
+                }
+            }
+            if (pivot != i) break;
+            if (pivot == i && max_val > EPS) break;
+            offset++;
+        }
+
+        if (max_val < EPS) {
+            // 接下来的所有行都已经是0了
+            for (int i = 0; i < L->rows; i++) L->data[Lrow[i] * L->cols + i] = 1.0;
+            *L_out = L;
+            *U_out = U;
+            *P_out = P;
+            return 1;
+        }
+        
+        // 3.2 交换行（交换指针，O(1)！）
+        if (pivot != i) {
+            int tmp = Urow[i];
+            Urow[i] = Urow[pivot];
+            Urow[pivot] = tmp; 
+
+            Lrow[i] = Lrow[pivot];
+            Lrow[pivot] = tmp;
+
+            Prow[i] = Prow[pivot];
+            Prow[pivot] = tmp;
+        }
+
+        // 3.3 消元
+        for (int j = i + 1; j < n; j++) {
+            double ratio = U->data[Urow[j] * U->cols + i + offset] / U->data[Urow[i] * U->cols + i + offset];
+            L->data[Lrow[j] * L->cols + i] = ratio;
+            for (int k = i + offset; k < m; k++) {
+                U->data[Urow[j] * U->cols + k] -= ratio * U->data[Urow[i] * U->cols + k];
+            }
+        }
+
+        i += offset;
+        // matrix_print(P, "P");
+        // matrix_print(L, "L");
+        // matrix_print(U, "U");
+    }
+    for (int i = 0; i < L->cols; i++) L->data[Lrow[i] * L->cols + i] = 1.0;
     *L_out = L;
     *U_out = U;
     *P_out = P;
