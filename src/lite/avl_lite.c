@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#define NIL NULL
 
 typedef struct Node {
     struct Node* left;
@@ -12,7 +11,9 @@ typedef struct Node {
 
 const int MAXN = 1e6+10;
 Node node[MAXN];
-Node* root_ptr;
+Node* NIL = &node[0];
+Node* root_ptr = &node[0];
+
 int idx;
 
 inline int get_height(Node* node) {
@@ -74,7 +75,7 @@ Node* rebalance(Node* pivot) {
 
 Node* insert_val(Node* root, int val) {
     // printf("testing... root = %p \n", root);
-    if (!root) {
+    if (root == NIL) {
         // printf("in NIL...\n");
         ++idx;
         node[idx].val = val;
@@ -148,17 +149,17 @@ Node* find_pre(Node* root, int val) {
     return pred;
 }
 
-Node* kth(Node* root, int k) {  // 1-indexed
-    if (root == NIL) return NIL;
+int kth(Node* root, int k) {  // 1-indexed
+    if (root == NIL) return 0;
     int left_size = (root->left == NIL) ? 0 : get_size(root->left);
     if (k <= left_size) return kth(root->left, k);
-    if (k == left_size + 1) return root;
+    if (k == left_size + 1) return root->val;
     return kth(root->right, k - left_size - 1);
 }
 
 int find_rank(Node* root, int val) {
     int rank = 0;
-    while (root != NIL) {
+    while (root != NIL && root->height != 0) {
         if (val <= root->val) {
             root = root->left;
         } else {
@@ -168,16 +169,22 @@ int find_rank(Node* root, int val) {
     }
     return rank + 1;
 }
-
+void print(Node* root) {
+    if (!root) return;
+    if (root->height == 0) return;
+    print(root->left);
+    printf("%d\n", root->val);
+    print(root->right);
+}
 int main() {
     freopen("P3369_9.in", "r", stdin);
     freopen("my_P3369_9_lite.out", "w", stdout);
+    node[0] = (Node){&node[0], &node[0], 0, 0, 0};
     int n;
     scanf("%d", &n);
     for (int i = 1, opt, x; i <= n; i++) {
         scanf("%d%d", &opt, &x);
         // printf("---");
-        Node* res;
         switch (opt) {
         case 1:
             root_ptr = insert_val(root_ptr, x);
@@ -186,24 +193,24 @@ int main() {
             root_ptr = delete_val(root_ptr, x);
             break;
         case 3:
-            printf("%d\n", find_rank(root_ptr, x));
+            printf("3-%d\n", find_rank(root_ptr, x));
             break;
         case 4:
-            res = kth(root_ptr, x);
-            printf("%d\n", res ? res->val : 0);
+            printf("4-%d\n", kth(root_ptr, x));
             break;
         case 5:
             // printf("predecessor of %d: %d.\n", x, avl_find_predecessor_val(tree, x));
-            printf("%d\n", find_pre(root_ptr, x)->val);
+            printf("5-%d\n", find_pre(root_ptr, x)->val);
             break;
         case 6:
             // printf("successor of %d: %d.\n", x, avl_find_successor_val(tree, x));
-            printf("%d\n", find_suc(root_ptr, x)->val);
+            printf("6-%d\n", find_suc(root_ptr, x)->val);
             break;
         default:
             break;
         }
     }
+    print(root_ptr);
     return 0;
 }
 
