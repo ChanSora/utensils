@@ -220,46 +220,6 @@ static Node* kth(Node* NIL, Node* root, int k) {  // 1-indexed
     return kth(NIL, root->right, k - left_size - 1);
 }
 
-// static int find_rank(Node* NIL, Node* root, int val) {
-//     int rank = 0;
-//     while (root != NIL) {
-//         if (val < root->val) root = root->left;
-//         else if (val > root->val) {
-//             rank += (root->left == NIL ? 0 : root->left->size) + 1;
-//             root = root->right;
-//         } else {
-//             // if (root->left->val == val) {
-//             //     root = root->left;
-//             //     continue;
-//             // }
-//             rank += (root->left == NIL ? 0 : root->left->size);
-//             break;
-//         }
-//     }
-//     return rank + 1;
-// }
-
-// static int find_rank(Node* NIL, Node* root, int val) {
-//     int rank = 0;
-//     while (root != NIL) {
-//         if (val < root->val) {
-//             root = root->left;
-//         } else if (val > root->val) {
-//             rank += (root->left == NIL ? 0 : root->left->size) + 1;
-//             root = root->right;
-//         } else {
-//             // 相等：向左找到最左边的等于 val 的节点
-//             Node* cur = root;
-//             while (cur->left != NIL && cur->left->val == val) {
-//                 cur = cur->left;
-//             }
-//             rank += (cur->left == NIL ? 0 : cur->left->size);
-//             break;
-//         }
-//     }
-//     return rank + 1;
-// }
-
 static int find_rank(Node* NIL, Node* root, int val) {
     int rank = 0;
     while (root != NIL) {
@@ -397,11 +357,17 @@ int avl_find_rank(AVLTree* tree, int val) {
 int main() {
     // freopen("P3369_9.in", "r", stdin);
     // freopen("my_P3369_9.out", "w", stdout);
-    int n;
-    scanf("%d", &n);
-    AVLTree* tree = avl_create(n);
-    for (int i = 1, opt, x; i <= n; i++) {
+    int n, m;
+    scanf("%d%d", &n, &m);
+    AVLTree* tree = avl_create(n + m);
+    for (int i = 1, x; i <= n; i++) {
+        scanf("%d", &x);
+        avl_insert(tree, x);
+    }
+    int ans = 0, last = 0;
+    for (int i = 1, opt, x; i <= m; i++) {
         scanf("%d%d", &opt, &x);
+        x = x ^ last;
         // printf("---");
         switch (opt) {
         case 1:
@@ -412,24 +378,33 @@ int main() {
             break;
         case 3:
             // printf("Smaller than %d : totally %d.\n", x, avl_find_rank(tree, x));
-            printf("%d\n", avl_find_rank(tree, x));
+            // printf("%d\n", avl_find_rank(tree, x));
+            last = avl_find_rank(tree, x);
+            ans ^= last;
             break;
         case 4:
             // printf("the %dth number: %d.\n", x, avl_find_kth_val(tree, x));
-            printf("%d\n", avl_find_kth_val(tree, x));
+            // printf("%d\n", avl_find_kth_val(tree, x));
+            last = avl_find_kth_val(tree, x);
+            ans ^= last;
             break;
         case 5:
             // printf("predecessor of %d: %d.\n", x, avl_find_predecessor_val(tree, x));
-            printf("%d\n", avl_find_predecessor_val(tree, x));
+            // printf("%d\n", avl_find_predecessor_val(tree, x));
+            last = avl_find_predecessor_val(tree, x);
+            ans ^= last;
             break;
         case 6:
             // printf("successor of %d: %d.\n", x, avl_find_successor_val(tree, x));
-            printf("%d\n", avl_find_successor_val(tree, x));
+            // printf("%d\n", avl_find_successor_val(tree, x));
+            last = avl_find_successor_val(tree, x);
+            ans ^= last;
             break;
         default:
             break;
         }
     }
     avl_destroy(tree);
+    printf("%d\n", ans);
     return 0;
 }
