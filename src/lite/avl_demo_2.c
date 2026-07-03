@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define MAXN 100010
+#define MAXN 1100010
 
 struct Node {
     struct Node* left;
@@ -173,4 +173,30 @@ void print(Node* root) {
     print(root->left);
     printf("%d\n", root->val);
     print(root->right);
+}
+
+int main() {
+    node[0] = (Node){&node[0], &node[0], 0, 0, 0};
+    int n, m;
+    scanf("%d%d", &n, &m);
+    for (int i = 1, x; i <= n; i++) {
+        scanf("%d", &x);
+        root_ptr = insert_val(root_ptr, x);
+    }
+    int ans = 0, last = 0, pre = 0;
+    for (int i = 1, opt, x; i <= m; i++) {
+        scanf("%d%d", &opt, &x);
+        x = x ^ last;
+        pre = last;
+        if (opt == 1) root_ptr = insert_val(root_ptr, x);
+        else if (opt == 2) root_ptr = delete_val(root_ptr, x);
+        else if (opt == 3) last = find_rank(root_ptr, x);
+        else if (opt == 4) last = kth(root_ptr, x);
+        else if (opt == 5) last = find_pre(root_ptr, x)->val;
+        else if (opt == 6) last = find_suc(root_ptr, x)->val;
+        if (opt >= 3) ans ^= last;
+        // printf("%d\n", last);
+    }
+    printf("%d\n", ans);
+    return 0;
 }

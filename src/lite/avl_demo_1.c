@@ -174,3 +174,19 @@ void print(Node* root) {
     printf("%d\n", root->val);
     print(root->right);
 }
+
+int main() {
+    node[0] = (Node){&node[0], &node[0], 0, 0, 0};
+    int n;
+    scanf("%d", &n);
+    for (int i = 1, opt, x; i <= n; i++) {
+        scanf("%d%d", &opt, &x);
+        if (opt == 1) root_ptr = insert_val(root_ptr, x);
+        else if (opt == 2) root_ptr = delete_val(root_ptr, x);
+        else if (opt == 3) printf("%d\n", find_rank(root_ptr, x));
+        else if (opt == 4) printf("%d\n", kth(root_ptr, x));
+        else if (opt == 5) printf("%d\n", find_pre(root_ptr, x)->val);
+        else if (opt == 6) printf("%d\n", find_suc(root_ptr, x)->val);
+    }
+    return 0;
+}
