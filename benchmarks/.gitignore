@@ -1,0 +1,8 @@
+bst/*
+!makefile
+!*.h
+!*.c
+!*.cpp
+!*_tree/
+
+bst/*_tree/*.o
