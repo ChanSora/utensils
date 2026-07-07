@@ -19,25 +19,25 @@ typedef struct {
     Node* root;
     Node* nil;
     Node* nodes;
-    int idx, MAX_NODES;
+    int idx, capacity;
     int (*cmp)(int a, int b);   // 可选比较函数
-} AVLTree;
+} AVL_Tree;
 
 // 公开 API
-AVLTree* avl_create_tree(int n);
-void avl_insert_val(AVLTree* tree, int val);
-void avl_delete_val(AVLTree* tree, int val);
-Node* avl_find_val(AVLTree* tree, int val);
-void avl_destroy_tree(AVLTree* tree);
-Node* avl_upper_bound(AVLTree* tree, int val);
-Node* avl_lower_bound(AVLTree* tree, int val);
-Node* avl_find_successor(AVLTree* tree, int val);
-int avl_find_successor_val(AVLTree* tree, int val);
-Node* avl_find_predecessor(AVLTree* tree, int val);
-int avl_find_predecessor_val(AVLTree* tree, int val);
-Node* avl_find_kth(AVLTree* tree, int k);
-int avl_find_kth_val(AVLTree* tree, int val);
-int avl_find_rank(AVLTree* tree, int val);
+AVL_Tree* avl_tree_create(int n);
+void avl_tree_insert(AVL_Tree* tree, int val);
+void avl_tree_delete(AVL_Tree* tree, int val);
+Node* avl_tree_find_val(AVL_Tree* tree, int val);
+void avl_tree_destroy(AVL_Tree* tree);
+Node* avl_tree_upper_bound(AVL_Tree* tree, int val);
+Node* avl_tree_lower_bound(AVL_Tree* tree, int val);
+Node* avl_tree_next(AVL_Tree* tree, int val);
+int avl_next_val(AVL_Tree* tree, int val);
+Node* avl_tree_prev(AVL_Tree* tree, int val);
+int avl_tree_prev_val(AVL_Tree* tree, int val);
+Node* avl_tree_kth(AVL_Tree* tree, int k);
+int avl_tree_kth_val(AVL_Tree* tree, int val);
+int avl_tree_rank(AVL_Tree* tree, int val);
 
 // Node 结构体定义在 .c 文件（外部不可见）
 inline static int get_height(Node* NIL, Node* node) {
@@ -239,11 +239,11 @@ static int find_rank(Node* NIL, Node* root, int val) {
     return rank + 1;
 }
 
-AVLTree* avl_create_tree(int n) {
+AVL_Tree* avl_tree_create(int n) {
     if (n <= 0) return NULL;
 
     // 1. 分配树结构体
-    AVLTree* tree = (AVLTree*)malloc(sizeof(AVLTree));
+    AVL_Tree* tree = (AVL_Tree*)malloc(sizeof(AVL_Tree));
     if (!tree) return NULL;
 
     // 2. 分配节点池（索引 0 留给哨兵）
@@ -255,7 +255,7 @@ AVLTree* avl_create_tree(int n) {
 
     // 3. 初始化
     tree->idx = 0;
-    tree->MAX_NODES = n;
+    tree->capacity = n;
 
     // 4. 初始化哨兵节点（索引 0）
     tree->nil = &tree->nodes[0];
@@ -272,9 +272,9 @@ AVLTree* avl_create_tree(int n) {
     return tree;
 }
 
-void avl_insert_val(AVLTree* tree, int val) {
+void avl_tree_insert(AVL_Tree* tree, int val) {
     // 防止越界
-    if (tree->idx >= tree->MAX_NODES) return;
+    if (tree->idx >= tree->capacity) return;
 
     int idx = ++tree->idx;
     Node* node = &tree->nodes[idx];
@@ -293,38 +293,38 @@ void avl_insert_val(AVLTree* tree, int val) {
     insert(&tree->root, tree->nil, tree->root, node);
 }
 
-void avl_delete_val(AVLTree* tree, int val) {
+void avl_tree_delete(AVL_Tree* tree, int val) {
     if (tree->root == tree->nil) return;
     delete_val(&tree->root, tree->nil, tree->root, val);
 }
 
-Node* avl_find_val(AVLTree* tree, int val) {
+Node* avl_tree_find_val(AVL_Tree* tree, int val) {
     return find(tree->root, tree->nil, val);
 }
 
-void avl_destroy_tree(AVLTree* tree) {
+void avl_tree_destroy(AVL_Tree* tree) {
     if (!tree) return;
     if (tree->nodes) free(tree->nodes);
     free(tree);
 }
 
-Node* avl_upper_bound(AVLTree* tree, int val) {
+Node* avl_tree_upper_bound(AVL_Tree* tree, int val) {
     return upper_bound(tree->root, tree->nil, val);     
 }
 
-Node* avl_lower_bound(AVLTree* tree, int val) {
+Node* avl_tree_lower_bound(AVL_Tree* tree, int val) {
     return lower_bound(tree->root, tree->nil, val);
 }
 
-Node* avl_find_successor(AVLTree* tree, int val) {
+Node* avl_tree_next(AVL_Tree* tree, int val) {
     return upper_bound(tree->root, tree->nil, val);
 }
 
-int avl_find_successor_val(AVLTree* tree, int val) {
-    return avl_find_successor(tree, val)->val;
+int avl_next_val(AVL_Tree* tree, int val) {
+    return avl_tree_next(tree, val)->val;
 }
 
-Node* avl_find_predecessor(AVLTree* tree, int val) {
+Node* avl_tree_prev(AVL_Tree* tree, int val) {
     Node* cur = tree->root;
     Node* pred = tree->nil;
     while (cur != tree->nil) {
@@ -338,19 +338,19 @@ Node* avl_find_predecessor(AVLTree* tree, int val) {
     return pred;
 }
 
-int avl_find_predecessor_val(AVLTree* tree, int val) {
-    return avl_find_predecessor(tree, val)->val;
+int avl_tree_prev_val(AVL_Tree* tree, int val) {
+    return avl_tree_prev(tree, val)->val;
 }
 
-Node* avl_find_kth(AVLTree* tree, int k) {
+Node* avl_tree_kth(AVL_Tree* tree, int k) {
     return kth(tree->nil, tree->root, k);
 }
 
-int avl_find_kth_val(AVLTree* tree, int val) {
-    return avl_find_kth(tree, val)->val;
+int avl_tree_kth_val(AVL_Tree* tree, int val) {
+    return avl_tree_kth(tree, val)->val;
 }
 
-int avl_find_rank(AVLTree* tree, int val) {
+int avl_tree_rank(AVL_Tree* tree, int val) {
     return find_rank(tree->nil, tree->root, val);
 }
 
@@ -359,37 +359,37 @@ int main() {
     // freopen("my_P3369_8.out", "w", stdout);
     int n;
     scanf("%d", &n);
-    AVLTree* tree = avl_create_tree(n);
+    AVL_Tree* tree = avl_tree_create(n);
     for (int i = 1, opt, x; i <= n; i++) {
         scanf("%d%d", &opt, &x);
         // printf("---");
         switch (opt) {
         case 1:
-            avl_insert_val(tree, x);
+            avl_tree_insert(tree, x);
             break;
         case 2:
-            avl_delete_val(tree, x);
+            avl_tree_delete(tree, x);
             break;
         case 3:
-            // printf("Smaller than %d : totally %d.\n", x, avl_find_rank(tree, x));
-            printf("%d\n", avl_find_rank(tree, x));
+            // printf("Smaller than %d : totally %d.\n", x, avl_tree_rank(tree, x));
+            printf("%d\n", avl_tree_rank(tree, x));
             break;
         case 4:
-            // printf("the %dth number: %d.\n", x, avl_find_kth_val(tree, x));
-            printf("%d\n", avl_find_kth_val(tree, x));
+            // printf("the %dth number: %d.\n", x, avl_tree_kth_val(tree, x));
+            printf("%d\n", avl_tree_kth_val(tree, x));
             break;
         case 5:
-            // printf("predecessor of %d: %d.\n", x, avl_find_predecessor_val(tree, x));
-            printf("%d\n", avl_find_predecessor_val(tree, x));
+            // printf("predecessor of %d: %d.\n", x, avl_tree_prev_val(tree, x));
+            printf("%d\n", avl_tree_prev_val(tree, x));
             break;
         case 6:
             // printf("successor of %d: %d.\n", x, avl_find_successor_val(tree, x));
-            printf("%d\n", avl_find_successor_val(tree, x));
+            printf("%d\n", avl_next_val(tree, x));
             break;
         default:
             break;
         }
     }
-    avl_destroy_tree(tree);
+    avl_tree_destroy(tree);
     return 0;
 }
