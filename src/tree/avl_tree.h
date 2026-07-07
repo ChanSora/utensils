@@ -1,20 +1,19 @@
-// avl_tree.h（公开头文件）
+/* 
+This is the header of the AVL Tree. 
+*/
 #ifndef AVL_TREE_H
 #define AVL_TREE_H
 
-// 声明 Node 结构体（不暴露内部细节）
 typedef struct Node Node;
 
-// 定义 AVLTree（包含根节点和哨兵）
 typedef struct {
     Node* root;
     Node* nil;
     Node* nodes;
-    int idx, capacity;
-    int (*cmp)(int a, int b);   // 可选比较函数
+    int idx;
+    int capacity;
 } AVL_Tree;
 
-// 公开 API
 AVL_Tree* avl_tree_create(int n);
 void avl_tree_insert(AVL_Tree* tree, int val);
 void avl_tree_delete(AVL_Tree* tree, int val);
@@ -28,7 +27,7 @@ int avl_next_val(AVL_Tree* tree, int val);
 Node* avl_tree_prev(AVL_Tree* tree, int val);
 int avl_tree_prev_val(AVL_Tree* tree, int val);
 Node* avl_tree_kth(AVL_Tree* tree, int k);
-int avl_tree_kth_val(AVL_Tree* tree, int val);
+int avl_tree_kth_val(AVL_Tree* tree, int k);
 int avl_tree_rank(AVL_Tree* tree, int val);
 
 #endif

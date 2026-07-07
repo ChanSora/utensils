@@ -6,6 +6,8 @@ lib/*
 examples/*_demoC
 *.out
 *.in
+*.log
+
 src/lite/*
 !src/lite/*.c
 !src/lite/include

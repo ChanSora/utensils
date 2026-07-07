@@ -198,10 +198,10 @@ static int find_rank(Node* NIL, Node* root, int val) {
     return rank + 1;
 }
 
-AVLTree* avl_create_tree(int n) {
+AVL_Tree* avl_tree_create(int n) {
     if (n <= 0) return NULL;
 
-    AVLTree* tree = (AVLTree*)malloc(sizeof(AVLTree));
+    AVL_Tree* tree = (AVL_Tree*)malloc(sizeof(AVL_Tree));
     if (!tree) return NULL;
 
     tree->nodes = (Node*)malloc((n + 1) * sizeof(Node));
@@ -211,7 +211,7 @@ AVLTree* avl_create_tree(int n) {
     }
 
     tree->idx = 0;
-    tree->MAX_NODES = n;
+    tree->capacity = n;
     tree->nil = &tree->nodes[0];
     tree->nil->parent = tree->nil;
     tree->nil->left = tree->nil;
@@ -225,8 +225,8 @@ AVLTree* avl_create_tree(int n) {
     return tree;
 }
 
-void avl_insert_val(AVLTree* tree, int val) {
-    if (tree->idx >= tree->MAX_NODES) return;
+void avl_tree_insert(AVL_Tree* tree, int val) {
+    if (tree->idx >= tree->capacity) return;
 
     int idx = ++tree->idx;
     Node* node = &tree->nodes[idx];
@@ -245,42 +245,42 @@ void avl_insert_val(AVLTree* tree, int val) {
     insert(&tree->root, tree->nil, tree->root, node);
 }
 
-void avl_delete_val(AVLTree* tree, int val) {
+void avl_tree_delete(AVL_Tree* tree, int val) {
     if (tree->root == tree->nil) return;
     delete_val(&tree->root, tree->nil, tree->root, val);
 }
 
-Node* avl_find(AVLTree* tree, int val) {
+Node* avl_tree_find(AVL_Tree* tree, int val) {
     return find(tree->root, tree->nil, val);
 }
 
-int avl_find_val(AVLTree* tree, int val) {
+int avl_tree_find_val(AVL_Tree* tree, int val) {
     return find(tree->root, tree->nil, val)->val;
 }
 
-void avl_destroy_tree(AVLTree* tree) {
+void avl_tree_destroy(AVL_Tree* tree) {
     if (!tree) return;
     if (tree->nodes) free(tree->nodes);
     free(tree);
 }
 
-Node* avl_upper_bound(AVLTree* tree, int val) {
+Node* avl_tree_upper_bound(AVL_Tree* tree, int val) {
     return upper_bound(tree->root, tree->nil, val);     
 }
 
-Node* avl_lower_bound(AVLTree* tree, int val) {
+Node* avl_tree_lower_bound(AVL_Tree* tree, int val) {
     return lower_bound(tree->root, tree->nil, val);
 }
 
-Node* avl_find_successor(AVLTree* tree, int val) {
+Node* avl_tree_next(AVL_Tree* tree, int val) {
     return upper_bound(tree->root, tree->nil, val);
 }
 
-int avl_find_successor_val(AVLTree* tree, int val) {
-    return avl_find_successor(tree, val)->val;
+int avl_next_val(AVL_Tree* tree, int val) {
+    return avl_tree_next(tree, val)->val;
 }
 
-Node* avl_find_predecessor(AVLTree* tree, int val) {
+Node* avl_tree_prev(AVL_Tree* tree, int val) {
     Node* cur = tree->root;
     Node* pred = tree->nil;
     while (cur != tree->nil) {
@@ -294,18 +294,18 @@ Node* avl_find_predecessor(AVLTree* tree, int val) {
     return pred;
 }
 
-int avl_find_predecessor_val(AVLTree* tree, int val) {
-    return avl_find_predecessor(tree, val)->val;
+int avl_tree_prev_val(AVL_Tree* tree, int val) {
+    return avl_tree_prev(tree, val)->val;
 }
 
-Node* avl_find_kth(AVLTree* tree, int k) {
+Node* avl_tree_kth(AVL_Tree* tree, int k) {
     return kth(tree->nil, tree->root, k);
 }
 
-int avl_find_kth_val(AVLTree* tree, int val) {
-    return avl_find_kth(tree, val)->val;
+int avl_tree_kth_val(AVL_Tree* tree, int k) {
+    return avl_tree_kth(tree, k)->val;
 }
 
-int avl_find_rank(AVLTree* tree, int val) {
+int avl_tree_rank(AVL_Tree* tree, int val) {
     return find_rank(tree->nil, tree->root, val);
 }
