@@ -11,3 +11,5 @@ examples/*_demoC
 src/lite/*
 !src/lite/*.c
 !src/lite/include
+
+.vscode/

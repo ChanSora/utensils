@@ -185,7 +185,7 @@ static void inorder(Node* node, Node* NIL) {
     inorder(node->right, NIL);
 }
 
-Node node[1000010];
+Node node[2000010];
 int idx;
 
 static Node* allocate_node(int val, Node* NIL) {
@@ -213,16 +213,43 @@ int main() {
 
     root_ptr = NIL;
 
-    int n;
-    scanf("%d", &n);
-    for (int i = 1, opt, x; i <= n; i++) {
-        scanf("%d%d", &opt, &x);
-        if (opt == 1) insert(&root_ptr, allocate_node(x, NIL), NIL);
-        if (opt == 2) erase(&root_ptr, x, NIL);
-        if (opt == 3) printf("%d\n", rank(root_ptr, x, NIL));
-        if (opt == 4) printf("%d\n", kth(root_ptr, x, NIL)->val);
-        if (opt == 5) printf("%d\n", prev(root_ptr, x, NIL)->val);
-        if (opt == 6) printf("%d\n", upper_bound(root_ptr, x, NIL)->val);
+    int n, m;
+    scanf("%d%d", &n, &m);
+    for (int i = 1, x; i <= n; i++) {
+        scanf("%d", &x);
+        insert(&root_ptr, allocate_node(x, NIL), NIL);
     }
+    int ans = 0, last = 0;
+    for (int i = 1, opt, x; i <= m; i++) {
+        scanf("%d%d", &opt, &x);
+        x = x ^ last;
+        switch (opt) {
+        case 1:
+            insert(&root_ptr, allocate_node(x, NIL), NIL);
+            break;
+        case 2:
+            erase(&root_ptr, x, NIL);
+            break;
+        case 3:
+            last = rank(root_ptr, x, NIL);
+            ans ^= last;
+            break;
+        case 4:
+            last = kth(root_ptr, x, NIL)->val;
+            ans ^= last;
+            break;
+        case 5:
+            last = prev(root_ptr, x, NIL)->val;
+            ans ^= last;
+            break;
+        case 6:
+            last = upper_bound(root_ptr, x, NIL)->val;
+            ans ^= last;
+            break;
+        default:
+            break;
+        }
+    }
+    printf("%d\n", ans);
     return 0;
 }
