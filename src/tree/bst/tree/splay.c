@@ -1,7 +1,23 @@
+/**
+ * @file splay.c
+ * @brief Splay tree implementation
+ *
+ * Core idea: splay the accessed node to the root on every operation,
+ * leveraging locality of reference to keep frequently accessed nodes near the top.
+ */
 #include <stdlib.h>
 #include <stdio.h>
 #include "splay.h"
 
+/**
+ * Splay tree node
+ * @param parent Parent node
+ * @param left   Left child
+ * @param right  Right child
+ * @param val    Node value
+ * @param size   Subtree size
+ * @param cnt    Duplicate count
+ */
 typedef struct Node {
     struct Node* parent;
     struct Node* left;
@@ -11,11 +27,13 @@ typedef struct Node {
     int cnt;
 } Node;
 
+/** Update node size information */
 static void update_size(Node* node, Node* NIL) {
     if (node == NIL) return;
     node->size = node->cnt + node->left->size + node->right->size;
 }
 
+/** Left rotation */
 static void rotate_left(Node** root_ptr, Node* node, Node* NIL) {
     
     if (node == NIL) return;
@@ -43,6 +61,7 @@ static void rotate_left(Node** root_ptr, Node* node, Node* NIL) {
 
 }
 
+/** Right rotation */
 static void rotate_right(Node** root_ptr, Node* node, Node* NIL) {
     if (node == NIL) return;
 
@@ -69,6 +88,14 @@ static void rotate_right(Node** root_ptr, Node* node, Node* NIL) {
     
 }
 
+/**
+ * Splay a node to the root via rotations
+ *
+ * Three patterns:
+ *   zig:      single rotation when parent is the root
+ *   zig-zig:  node and parent on the same side -> rotate parent first, then node
+ *   zig-zag:  node and parent on opposite sides -> rotate node first, then the other side
+ */
 static void splay(Node** root_ptr, Node* node, Node* NIL) {
     if (node == NIL || node == *root_ptr) return;
     Node* parent = node->parent;
@@ -97,6 +124,7 @@ static void splay(Node** root_ptr, Node* node, Node* NIL) {
     }
 }
 
+/** Insert a node, then splay it to the root */
 static void insert(Node** root_ptr, Node* node, Node* NIL) {
     if (node == NIL) return;
     if (*root_ptr == NIL) {
@@ -126,6 +154,10 @@ static void insert(Node** root_ptr, Node* node, Node* NIL) {
     splay(root_ptr, node, NIL);
 }
 
+/**
+ * Delete a node by value.
+ * Splay the target to the root, then merge left and right subtrees.
+ */
 static void erase(Node** root_ptr, int val, Node* NIL) {
     Node* cur = *root_ptr;
     Node* parent = NIL;
@@ -166,6 +198,7 @@ static void erase(Node** root_ptr, int val, Node* NIL) {
     update_size(successor, NIL);
 }
 
+/** Find a node by value (no splay) */
 static Node* find(Node** root_ptr, int val, Node* NIL) {
     Node* node = *root_ptr;
     while (node != NIL) {
@@ -181,6 +214,7 @@ static Node* find(Node** root_ptr, int val, Node* NIL) {
     return NIL;
 }
 
+/** Compute rank of val (1-indexed) */
 static int rank(Node** root_ptr, int val, Node* NIL) {
     Node* node = *root_ptr;
     Node* parent = NIL;
@@ -194,6 +228,7 @@ static int rank(Node** root_ptr, int val, Node* NIL) {
     return rank + 1;
 } 
 
+/** Get node with rank k (1-indexed) */
 static Node* kth(Node** root_ptr, int k, Node* NIL) {
     Node* node = *root_ptr;
     while (node != NIL) {
@@ -207,6 +242,7 @@ static Node* kth(Node** root_ptr, int k, Node* NIL) {
     return NIL;
 }
 
+/** Find predecessor (largest node < val) */
 static Node* prev(Node** root_ptr, int val, Node* NIL) {
     Node* node = *root_ptr;
     Node* prev = NIL;
@@ -221,6 +257,7 @@ static Node* prev(Node** root_ptr, int val, Node* NIL) {
     return prev;
 }
 
+/** Find first node >= val */
 static Node* lower_bound(Node** root_ptr, int val, Node* NIL) {
     Node* node = *root_ptr;
     Node* next = NIL;
@@ -235,6 +272,7 @@ static Node* lower_bound(Node** root_ptr, int val, Node* NIL) {
     return next;
 }
 
+/** Find first node > val */
 static Node* upper_bound(Node** root_ptr, int val, Node* NIL) {
     Node* node = *root_ptr;
     Node* next = NIL;
@@ -249,6 +287,11 @@ static Node* upper_bound(Node** root_ptr, int val, Node* NIL) {
     return next;
 }
 
+/**
+ * Create a splay tree
+ * @param n Maximum capacity
+ * @return Pointer to the tree on success, NULL on failure
+ */
 Splay* splay_create(int n) {
     if (n <= 0) return NULL;
 
@@ -274,12 +317,14 @@ Splay* splay_create(int n) {
     return tree;
 }
 
+/** Destroy the tree */
 void splay_destroy(Splay* tree) {
     if (!tree) return;
     free(tree->nodes);
     free(tree);
 }
 
+/** Insert a value */
 void splay_insert(Splay* tree, int val) {
     if (tree->idx >= tree->capacity) return;
 
@@ -294,50 +339,62 @@ void splay_insert(Splay* tree, int val) {
     insert(&tree->root, node, tree->nil);
 }
 
+/** Erase a value */
 void splay_erase(Splay* tree, int val) {
     erase(&tree->root, val, tree->nil);
 }
 
+/** Find a node by value */
 Node* splay_find(Splay* tree, int val) {
     return find(&tree->root, val, tree->nil);
 }
 
+/** Find a value and return it */
 int splay_find_val(Splay* tree, int val) {
     return find(&tree->root, val, tree->nil)->val;
 }
 
+/** Get rank of val (1-indexed) */
 int splay_rank(Splay* tree, int val) {
     return rank(&tree->root, val, tree->nil);
 }
 
+/** Get node with rank k (1-indexed) */
 Node* splay_kth(Splay* tree, int k) {
     return kth(&tree->root, k, tree->nil);
 }
 
+/** Get value with rank k (1-indexed) */
 int splay_kth_val(Splay* tree, int k) {
     return kth(&tree->root, k, tree->nil)->val;
 }
 
+/** Get predecessor of val */
 Node* splay_prev(Splay* tree, int val) {
     return prev(&tree->root, val, tree->nil);
 }
 
+/** Get predecessor value of val */
 int splay_prev_val(Splay* tree, int val) {
     return prev(&tree->root, val, tree->nil)->val;
 }
 
+/** Get first node >= val */
 Node* splay_lower_bound(Splay* tree, int val) {
     return lower_bound(&tree->root, val, tree->nil);
 }
 
+/** Get first node > val */
 Node* splay_upper_bound(Splay* tree, int val) {
     return upper_bound(&tree->root, val, tree->nil);
 }
 
+/** Get successor of val */
 Node* splay_next(Splay* tree, int val) {
     return upper_bound(&tree->root, val, tree->nil);
 }
 
+/** Get successor value of val */
 int splay_next_val(Splay* tree, int val) {
     return upper_bound(&tree->root, val, tree->nil)->val;
 }

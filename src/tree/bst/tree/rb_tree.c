@@ -13,11 +13,13 @@ typedef struct Node {
     Color color;  
 } Node;
 
+/** Update subtree size */
 static void update_size(Node* node, Node* NIL) {
     if (node == NIL) return;
     node->size = 1 + node->left->size + node->right->size;
 }
 
+/** Left rotation */
 static void rotate_left(Node** root_ptr, Node* node, Node* NIL) {
     
     if (node == NIL) return;
@@ -45,6 +47,7 @@ static void rotate_left(Node** root_ptr, Node* node, Node* NIL) {
 
 }
 
+/** Right rotation */
 static void rotate_right(Node** root_ptr, Node* node, Node* NIL) {
     if (node == NIL) return;
 
@@ -71,6 +74,7 @@ static void rotate_right(Node** root_ptr, Node* node, Node* NIL) {
     
 }
 
+/** Fix red-black properties after insertion */
 static void insert_fixup(Node** root_ptr, Node* node, Node* NIL) {
     while (node->parent->color == RED) {
         Node* parent = node->parent;
@@ -106,6 +110,7 @@ static void insert_fixup(Node** root_ptr, Node* node, Node* NIL) {
     (*root_ptr)->color = BLACK;  // Case 1 & 2: make root's color black, then return.
 }
 
+/** Insert a node into the red-black tree */
 static void insert(Node** root_ptr, Node* node, Node* NIL) {
     if (*root_ptr == NIL) { // case 1: new node is the root.
         *root_ptr = node;
@@ -127,6 +132,7 @@ static void insert(Node** root_ptr, Node* node, Node* NIL) {
     insert_fixup(root_ptr, node, NIL);
 }
 
+/** Fix red-black properties after deletion */
 static void erase_fixup(Node** root_ptr, Node* node, Node* NIL) {
     while (node != (*root_ptr) && node->color != RED) {
         Node* parent = node->parent;
@@ -182,6 +188,7 @@ static void erase_fixup(Node** root_ptr, Node* node, Node* NIL) {
     node->color = BLACK;
 }
 
+/** Delete a node by value from the red-black tree */
 static void erase(Node** root_ptr, int val, Node* NIL) {
     Node* node = *root_ptr;
     Node* target = NIL;
@@ -232,6 +239,7 @@ static void erase(Node** root_ptr, int val, Node* NIL) {
     NIL->parent = NIL;
 }
 
+/** Find a node by value */
 static Node* find(Node* node, int val, Node* NIL) {
     while (node != NIL) {
         if (val < node->val) node = node->left;
@@ -241,6 +249,7 @@ static Node* find(Node* node, int val, Node* NIL) {
     return NIL;
 }
 
+/** Compute rank of val (1-indexed) */
 static int rank(Node* node, int val, Node* NIL) {
     int rank = 0;
     while (node != NIL) {
@@ -250,6 +259,7 @@ static int rank(Node* node, int val, Node* NIL) {
     return rank + 1;
 } 
 
+/** Get the node with rank k (1-indexed) */
 static Node* kth(Node* node, int k, Node* NIL) {
     while (node != NIL) {
         if (node->left->size >= k) node = node->left;
@@ -259,6 +269,7 @@ static Node* kth(Node* node, int k, Node* NIL) {
     return NIL;
 }
 
+/** Find predecessor (largest node < val) */
 static Node* prev(Node* node, int val, Node* NIL) {
     Node* prev = NIL;
     while (node != NIL) {
@@ -268,6 +279,7 @@ static Node* prev(Node* node, int val, Node* NIL) {
     return prev;
 }
 
+/** Find first node >= val */
 static Node* lower_bound(Node* node, int val, Node* NIL) {
     Node* next = NIL;
     while (node != NIL) {
@@ -277,6 +289,7 @@ static Node* lower_bound(Node* node, int val, Node* NIL) {
     return next;
 }
 
+/** Find first node > val */
 static Node* upper_bound(Node* node, int val, Node* NIL) {
     Node* next = NIL;
     while (node != NIL) {
