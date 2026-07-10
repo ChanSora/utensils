@@ -1,5 +1,5 @@
 #include <stdlib.h>
-
+#include <stdio.h>
 #include "splay.h"
 
 typedef struct Node {
@@ -174,6 +174,7 @@ static Node* find(Node** root_ptr, int val, Node* NIL) {
         else break;
     }
     if (node != NIL) {
+        // printf("find val %d\n", val);
         splay(root_ptr, node, NIL);
         return node;
     }
@@ -298,46 +299,46 @@ void splay_erase(Splay* tree, int val) {
 }
 
 Node* splay_find(Splay* tree, int val) {
-    return find(tree->root, val, tree->nil);
+    return find(&tree->root, val, tree->nil);
 }
 
 int splay_find_val(Splay* tree, int val) {
-    return find(tree->root, val, tree->nil)->val;
+    return find(&tree->root, val, tree->nil)->val;
 }
 
 int splay_rank(Splay* tree, int val) {
-    return rank(tree->root, val, tree->nil);
+    return rank(&tree->root, val, tree->nil);
 }
 
 Node* splay_kth(Splay* tree, int k) {
-    return kth(tree->root, k, tree->nil);
+    return kth(&tree->root, k, tree->nil);
 }
 
 int splay_kth_val(Splay* tree, int k) {
-    return kth(tree->root, k, tree->nil)->val;
+    return kth(&tree->root, k, tree->nil)->val;
 }
 
 Node* splay_prev(Splay* tree, int val) {
-    return prev(tree->root, val, tree->nil);
+    return prev(&tree->root, val, tree->nil);
 }
 
 int splay_prev_val(Splay* tree, int val) {
-    return prev(tree->root, val, tree->nil)->val;
+    return prev(&tree->root, val, tree->nil)->val;
 }
 
 Node* splay_lower_bound(Splay* tree, int val) {
-    return lower_bound(tree->root, val, tree->nil);
+    return lower_bound(&tree->root, val, tree->nil);
 }
 
 Node* splay_upper_bound(Splay* tree, int val) {
-    return upper_bound(tree->root, val, tree->nil);
+    return upper_bound(&tree->root, val, tree->nil);
 }
 
 Node* splay_next(Splay* tree, int val) {
-    return upper_bound(tree->root, val, tree->nil);
+    return upper_bound(&tree->root, val, tree->nil);
 }
 
 int splay_next_val(Splay* tree, int val) {
-    return upper_bound(tree->root, val, tree->nil)->val;
+    return upper_bound(&tree->root, val, tree->nil)->val;
 }
 

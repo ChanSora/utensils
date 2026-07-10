@@ -13,10 +13,8 @@ BUILD_DIR = build
 LIB_DIR = lib
 
 SOURCES = $(shell find $(SRC_DIR) -name "*.c")
-
 OBJECTS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SOURCES))
 
-OBJ_DIRS = $(sort $(dir $(OBJECTS)))
 
 all: $(LIB_DIR)/$(TARGET)
 

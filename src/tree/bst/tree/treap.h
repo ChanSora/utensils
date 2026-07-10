@@ -2,6 +2,8 @@
 #ifndef TREAP_H
 #define TREAP_H
 
+#include <utensils/rng.h>
+
 typedef struct Node Node;
 
 typedef struct {
@@ -10,6 +12,7 @@ typedef struct {
     Node* nodes;
     int idx;
     int capacity;
+    RNG* rng;
 } Treap;
 
 Treap* treap_create(int n);

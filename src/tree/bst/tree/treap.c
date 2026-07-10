@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <stdint.h>
 
+#include <utensils/rng.h>
 #include "treap.h"
 
 typedef struct Node {
@@ -8,7 +10,7 @@ typedef struct Node {
     struct Node* right;
     int val;
     int size;
-    int priority;
+    uint32_t priority;
 } Node;
 
 static void update_size(Node* node, Node* NIL) {
@@ -202,6 +204,8 @@ Treap* treap_create(int n) {
     tree->root = tree->nil;
     tree->idx = 0;
     tree->capacity = n;
+    tree->rng = (RNG*)malloc(sizeof(RNG));
+    rng_init_auto(tree->rng);
     return tree;
 }
 
@@ -220,7 +224,7 @@ void treap_insert(Treap* tree, int val) {
     node->left = tree->nil;
     node->right = tree->nil;
     node->size = 1;
-    node->priority = rand();
+    node->priority = rng_next_u32(tree->rng);
 
     insert(&tree->root, node, tree->nil);
 }

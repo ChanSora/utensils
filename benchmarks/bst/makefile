@@ -1,20 +1,23 @@
 CC = clang
-CFLAGS = -O2 -Wall -Wextra -I. -I./avl_tree -I./rb_tree
-LDFLAGS = -lm
+CFLAGS = -O2 -Wall -Wextra -I. -I../../include
+LDFLAGS = -L../../lib -lm -lutensils
 
-# 公共依赖（树实现 + 测试用例）
-TREE_SRCS = ./avl_tree/avl_tree.c ./rb_tree/rb_tree.c
-BENCH_SRCS = bst_benchmarks.c bench_sequential.c bench_random.c bench_common.c bench_concurrent_find.c
-OBJS = $(TREE_SRCS:.c=.o) $(BENCH_SRCS:.c=.o)
+SRC_DIR = .
+BUILD_DIR = build
+
 TARGET = bench_all
+
+SOURCES = $(shell find $(SRC_DIR) -name "*.c")
+OBJECTS = $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SOURCES))
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CC) $^ -o $@ $(LDFLAGS)
-
-%.o: %.c
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TARGET): $(OBJECTS)
+	$(CC) $^ -o $@ $(LDFLAGS)
 
 run: $(TARGET)
 	./$(TARGET)

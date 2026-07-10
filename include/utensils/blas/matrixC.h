@@ -1,12 +1,11 @@
 #ifndef MATRIXC_H
 #define MATRIXC_H
 
-// ==================== 矩阵结构体 ====================
 typedef struct {
     int rows;
     int cols;
     int size;
-    double* data;  // 指针数组：单指针数组，内存访问更友好
+    double* data;
     int* row_order;
 } MatrixC;
 

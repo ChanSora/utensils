@@ -183,11 +183,10 @@ int main() {
         scanf("%d", &x);
         root_ptr = insert_val(root_ptr, x);
     }
-    int ans = 0, last = 0, pre = 0;
+    int ans = 0, last = 0;
     for (int i = 1, opt, x; i <= m; i++) {
         scanf("%d%d", &opt, &x);
         x = x ^ last;
-        pre = last;
         if (opt == 1) root_ptr = insert_val(root_ptr, x);
         else if (opt == 2) root_ptr = delete_val(root_ptr, x);
         else if (opt == 3) last = find_rank(root_ptr, x);

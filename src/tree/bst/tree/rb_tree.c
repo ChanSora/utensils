@@ -154,8 +154,8 @@ static void erase_fixup(Node** root_ptr, Node* node, Node* NIL) {
             continue;
         }
 
-        if (node == parent->left && sibling->right->color == BLACK
-        || node == parent->right && sibling->left->color == BLACK) {
+        if ((node == parent->left && sibling->right->color == BLACK)
+        || (node == parent->right && sibling->left->color == BLACK)) {
             sibling->color = RED;
             if (node == parent->left) {
                 sibling->left->color = BLACK;

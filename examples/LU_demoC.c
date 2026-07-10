@@ -1,8 +1,7 @@
-#include "matrixC.h"
-#include "linalgC.h"
-
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <utensils/blas.h>
 
 // ==================== 验证：P * A == L * U ====================
 int verify_lu(MatrixC* A, MatrixC* L, MatrixC* U, MatrixC* P) {
