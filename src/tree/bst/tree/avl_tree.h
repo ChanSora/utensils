@@ -33,7 +33,7 @@ typedef struct {
  */
 AVL_Tree* avl_tree_create(int n);
 
-/** @brief 销毁 AVL 树，释放节点池 */
+/** @brief Destroy the tree and free resources */
 void avl_tree_destroy(AVL_Tree* tree);
 
 /** @brief Insert a value into the tree */
