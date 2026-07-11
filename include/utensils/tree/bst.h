@@ -1,10 +1,45 @@
+/**
+ * @file bst.h
+ * @brief Polymorphic Balanced Binary Search Tree interface
+ *
+ * This header defines a unified, type-erased Tree interface backed by a
+ * vtable of function pointers.  The same `Tree` object can dispatch to
+ * any of the four concrete balanced BST implementations:
+ *
+ *   - Red-Black Tree  (RB_TREE)
+ *   - AVL Tree        (AVL_TREE)
+ *   - Treap           (TREAP)
+ *   - Splay Tree      (SPLAY)
+ *
+ * Usage:
+ *   Tree t = tree_init(AVL_TREE);
+ *   t.create(&t, 10000);
+ *   t.insert(&t, 42);
+ *   int r = t.rank(&t, 42);
+ *   t.destroy(&t);
+ */
+
+/** Supported concrete tree implementations */
 typedef enum TreeType {
-    RB_TREE, AVL_TREE, TREAP, SPLAY
+    RB_TREE,     ///< Red-Black Tree
+    AVL_TREE,    ///< AVL Tree
+    TREAP,       ///< Treap (Tree + Heap)
+    SPLAY        ///< Splay Tree
 } TreeType;
 
+/**
+ * Polymorphic balanced BST handle.
+ *
+ * All pointer fields are function pointers implementing the vtable.
+ * `data` holds a type-erased pointer to the concrete tree (RB_Tree*,
+ * AVL_Tree*, etc.).  Call tree_init() to set up the vtable, then
+ * create() to allocate the concrete tree.
+ */
 typedef struct Tree {
-    TreeType type;
-    void* data;
+    TreeType type;       ///< Backend tree type
+
+    void* data;          ///< Opaque pointer to the concrete tree instance
+
     void (*create)(struct Tree* self, int capacity);
     void (*destroy)(struct Tree* self);
     void (*insert)(struct Tree* self, int val);
@@ -22,5 +57,11 @@ typedef struct Tree {
     int (*next_val)(struct Tree* self, int val);
 } Tree;
 
+/**
+ * @brief Initialise a Tree with the vtable for the chosen backend.
+ * @param type One of RB_TREE, AVL_TREE, TREAP, or SPLAY
+ * @return A Tree whose function pointers dispatch to the selected
+ *         implementation.  Call create() before any other operations.
+ */
 Tree tree_init(TreeType type);
 

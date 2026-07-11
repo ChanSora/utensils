@@ -1,3 +1,19 @@
+/**
+ * @file bst.c
+ * @brief Polymorphic BST dispatch layer
+ *
+ * This file is the single compilation unit that maps the abstract Tree
+ * vtable to the four concrete tree backends (AVL, RB, Treap, Splay).
+ *
+ * Each vtable entry is a thin wrapper (e.g. bst_insert) that switches on
+ * tree->type and delegates to the corresponding backend function after
+ * casting the opaque `data` pointer to the correct concrete type.
+ *
+ * Locking / error handling are intentionally omitted to keep the
+ * dispatch as cheap as possible — the caller is expected to guard against
+ * misuse (e.g. calling operations before create()).
+ */
+
 #include <utensils/tree.h>
 
 #include <stdlib.h>
@@ -7,22 +23,43 @@
 #include "tree/treap.h"
 #include "tree/splay.h"
 
+/* ------------------------------------------------------------------ */
+/* Forward declarations — each maps to one vtable slot                 */
+/* ------------------------------------------------------------------ */
 
 static void bst_create(Tree* tree, int capacity);
+/** Deallocate the concrete tree backend */
 static void bst_destroy(Tree* tree);
+/** Insert a value into the tree */
 static void bst_insert(Tree* tree, int val);
+/** Erase a value from the tree */
 static void bst_erase(Tree* tree, int val);
+/** Find a node by value (returns NULL if not found) */
 static void* bst_find(Tree* tree, int val);
+/** Find a value and return it */
 static int bst_find_val(Tree* tree, int val);
+/** Get the rank of val (1-indexed) */
 static int bst_rank(Tree* tree, int val);
+/** Get the node with rank k (1-indexed) */
 static void* bst_kth(Tree* tree, int k);
+/** Get the value with rank k (1-indexed) */
 static int bst_kth_val(Tree* tree, int k);
+/** Get the first node >= val */
 static void* bst_lower_bound(Tree* tree, int val);
+/** Get the first node > val */
 static void* bst_upper_bound(Tree* tree, int val);
+/** Get the predecessor of val */
 static void* bst_prev(Tree* tree, int val);
+/** Get the predecessor value of val */
 static int bst_prev_val(Tree* tree, int val);
+/** Get the successor of val */
 static void* bst_next(Tree* tree, int val);
+/** Get the successor value of val */
 static int bst_next_val(Tree* tree, int val);
+
+/* ================================================================== */
+/*  tree_init — vtable initialisation                                  */
+/* ================================================================== */
 
 Tree tree_init(TreeType type) {
     Tree tree;
@@ -46,6 +83,11 @@ Tree tree_init(TreeType type) {
     return tree;
 }
 
+/* ================================================================== */
+/*  Dispatch wrappers — type-erased switch on tree->type              */
+/* ================================================================== */
+
+/** Allocate the concrete tree backend */
 static void bst_create(Tree* tree, int capacity) {
     switch (tree->type) {
         case RB_TREE:   tree->data = rb_tree_create(capacity); break;
@@ -56,6 +98,7 @@ static void bst_create(Tree* tree, int capacity) {
     }
 }
 
+/** Deallocate the concrete tree backend */
 static void bst_destroy(Tree* tree) {
     if (!tree->data) return;
     switch (tree->type) {
@@ -68,6 +111,7 @@ static void bst_destroy(Tree* tree) {
     tree->data = NULL;
 }
 
+/** Insert a value into the tree */
 static void bst_insert(Tree* tree, int val) {
     if (!tree->data) return;
     switch (tree->type) {
@@ -79,6 +123,7 @@ static void bst_insert(Tree* tree, int val) {
     }
 }
 
+/** Erase a value from the tree */
 static void bst_erase(Tree* tree, int val) {
     if (!tree->data) return;
     switch (tree->type) {
@@ -90,6 +135,7 @@ static void bst_erase(Tree* tree, int val) {
     }
 }
 
+/** Find a node by value (returns NULL if not found) */
 static void* bst_find(Tree* tree, int val) {
     if (!tree->data) return NULL;
     switch (tree->type) {
@@ -101,6 +147,7 @@ static void* bst_find(Tree* tree, int val) {
     }
 }
 
+/** Find a value and return it */
 static int bst_find_val(Tree* tree, int val) {
     if (!tree->data) return 0;
     switch (tree->type) {
@@ -112,6 +159,7 @@ static int bst_find_val(Tree* tree, int val) {
     }
 }
 
+/** Get the rank of val (1-indexed) */
 static int bst_rank(Tree* tree, int val) {
     if (!tree->data) return 0;
     switch (tree->type) {
@@ -123,6 +171,7 @@ static int bst_rank(Tree* tree, int val) {
     }
 }
 
+/** Get the node with rank k (1-indexed) */
 static void* bst_kth(Tree* tree, int k) {
     if (!tree->data) return NULL;
     switch (tree->type) {
@@ -134,6 +183,7 @@ static void* bst_kth(Tree* tree, int k) {
     }
 }
 
+/** Get the value with rank k (1-indexed) */
 static int bst_kth_val(Tree* tree, int k) {
     if (!tree->data) return 0;
     switch (tree->type) {
@@ -145,6 +195,7 @@ static int bst_kth_val(Tree* tree, int k) {
     }
 }
 
+/** Get the first node >= val */
 static void* bst_lower_bound(Tree* tree, int val) {
     if (!tree->data) return NULL;
     switch (tree->type) {
@@ -156,6 +207,7 @@ static void* bst_lower_bound(Tree* tree, int val) {
     }
 }
 
+/** Get the first node > val */
 static void* bst_upper_bound(Tree* tree, int val) {
     if (!tree->data) return NULL;
     switch (tree->type) {
@@ -167,6 +219,7 @@ static void* bst_upper_bound(Tree* tree, int val) {
     }
 }
 
+/** Get the predecessor of val */
 static void* bst_prev(Tree* tree, int val) {
     if (!tree->data) return NULL;
     switch (tree->type) {
@@ -178,6 +231,7 @@ static void* bst_prev(Tree* tree, int val) {
     }
 }
 
+/** Get the predecessor value of val */
 static int bst_prev_val(Tree* tree, int val) {
     if (!tree->data) return 0;
     switch (tree->type) {
@@ -189,6 +243,7 @@ static int bst_prev_val(Tree* tree, int val) {
     }
 }
 
+/** Get the successor of val */
 static void* bst_next(Tree* tree, int val) {
     if (!tree->data) return NULL;
     switch (tree->type) {
@@ -200,6 +255,7 @@ static void* bst_next(Tree* tree, int val) {
     }
 }
 
+/** Get the successor value of val */
 static int bst_next_val(Tree* tree, int val) {
     if (!tree->data) return 0;
     switch (tree->type) {
