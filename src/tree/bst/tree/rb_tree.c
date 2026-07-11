@@ -299,6 +299,7 @@ static Node* upper_bound(Node* node, int val, Node* NIL) {
     return next;
 }
 
+/** Create a Red-Black tree with room for n nodes */
 RB_Tree* rb_tree_create(int n) {
     if (n <= 0) return NULL;
 
@@ -324,12 +325,14 @@ RB_Tree* rb_tree_create(int n) {
     return tree;
 }
 
+/** Destroy the Red-Black tree and free resources */
 void rb_tree_destroy(RB_Tree* tree) {
     if (!tree) return;
     free(tree->nodes);
     free(tree);
 }
 
+/** Insert a value into the Red-Black tree */
 void rb_tree_insert(RB_Tree* tree, int val) {
     if (tree->idx >= tree->capacity) return;
 
@@ -344,50 +347,62 @@ void rb_tree_insert(RB_Tree* tree, int val) {
     insert(&tree->root, node, tree->nil);
 }
 
+/** Erase a value from the Red-Black tree */
 void rb_tree_erase(RB_Tree* tree, int val) {
     erase(&tree->root, val, tree->nil);
 }
 
+/** Find a node by value */
 Node* rb_tree_find(RB_Tree* tree, int val) {
     return find(tree->root, val, tree->nil);
 }
 
+/** Find a value and return it */
 int rb_tree_find_val(RB_Tree* tree, int val) {
     return find(tree->root, val, tree->nil)->val;
 }
 
+/** Get the rank of val (1-indexed) */
 int rb_tree_rank(RB_Tree* tree, int val) {
     return rank(tree->root, val, tree->nil);
 }
 
+/** Get the node with rank k (1-indexed) */
 Node* rb_tree_kth(RB_Tree* tree, int k) {
     return kth(tree->root, k, tree->nil);
 }
 
+/** Get the value with rank k (1-indexed) */
 int rb_tree_kth_val(RB_Tree* tree, int k) {
     return kth(tree->root, k, tree->nil)->val;
 }
 
+/** Get the predecessor of val */
 Node* rb_tree_prev(RB_Tree* tree, int val) {
     return prev(tree->root, val, tree->nil);
 }
 
+/** Get the predecessor value of val */
 int rb_tree_prev_val(RB_Tree* tree, int val) {
     return prev(tree->root, val, tree->nil)->val;
 }
 
+/** Get the first node >= val */
 Node* rb_tree_lower_bound(RB_Tree* tree, int val) {
     return lower_bound(tree->root, val, tree->nil);
 }
 
+/** Get the first node > val */
 Node* rb_tree_upper_bound(RB_Tree* tree, int val) {
     return upper_bound(tree->root, val, tree->nil);
 }
 
+/** Get the successor of val */
 Node* rb_tree_next(RB_Tree* tree, int val) {
     return upper_bound(tree->root, val, tree->nil);
 }
 
+/** Get the successor value of val */
 int rb_tree_next_val(RB_Tree* tree, int val) {
     return upper_bound(tree->root, val, tree->nil)->val;
 }

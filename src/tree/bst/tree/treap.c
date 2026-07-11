@@ -226,9 +226,9 @@ static Node* upper_bound(Node* node, int val, Node* NIL) {
 }
 
 /**
- * 创建 Treap
- * @param n 最大容量
- * @return 成功返回树指针，失败返回 NULL
+ * Create a Treap
+ * @param n Maximum capacity
+ * @return Pointer to the tree on success, NULL on failure
  */
 Treap* treap_create(int n) {
     if (n <= 0) return NULL;
@@ -257,14 +257,14 @@ Treap* treap_create(int n) {
     return tree;
 }
 
-/** 销毁 Treap */
+/** Destroy the Treap and free resources */
 void treap_destroy(Treap* tree) {
     if (!tree) return;
     free(tree->nodes);
     free(tree);
 }
 
-/** 插入值 val */
+/** Insert a value into the Treap */
 void treap_insert(Treap* tree, int val) {
     if (tree->idx >= tree->capacity) return;
 
@@ -279,62 +279,62 @@ void treap_insert(Treap* tree, int val) {
     insert(&tree->root, node, tree->nil);
 }
 
-/** 删除值 val */
+/** Erase a value from the Treap */
 void treap_erase(Treap* tree, int val) {
     erase(&tree->root, val, tree->nil);
 }
 
-/** 查找值 val，返回节点指针 */
+/** Find a node by value */
 Node* treap_find(Treap* tree, int val) {
     return find(tree->root, val, tree->nil);
 }
 
-/** 查找值 val，返回值 */
+/** Find a value and return it */
 int treap_find_val(Treap* tree, int val) {
     return find(tree->root, val, tree->nil)->val;
 }
 
-/** 求 val 的排名 (1-indexed) */
+/** Get the rank of val (1-indexed) */
 int treap_rank(Treap* tree, int val) {
     return rank(tree->root, val, tree->nil);
 }
 
-/** 返回排名为 k 的节点 (1-indexed) */
+/** Get the node with rank k (1-indexed) */
 Node* treap_kth(Treap* tree, int k) {
     return kth(tree->root, k, tree->nil);
 }
 
-/** 返回排名为 k 的值 (1-indexed) */
+/** Get the value with rank k (1-indexed) */
 int treap_kth_val(Treap* tree, int k) {
     return kth(tree->root, k, tree->nil)->val;
 }
 
-/** 返回 val 的前驱节点 */
+/** Get the predecessor of val */
 Node* treap_prev(Treap* tree, int val) {
     return prev(tree->root, val, tree->nil);
 }
 
-/** 返回 val 的前驱值 */
+/** Get the predecessor value of val */
 int treap_prev_val(Treap* tree, int val) {
     return prev(tree->root, val, tree->nil)->val;
 }
 
-/** 返回第一个 >= val 的节点 */
+/** Get the first node >= val */
 Node* treap_lower_bound(Treap* tree, int val) {
     return lower_bound(tree->root, val, tree->nil);
 }
 
-/** 返回第一个 > val 的节点 */
+/** Get the first node > val */
 Node* treap_upper_bound(Treap* tree, int val) {
     return upper_bound(tree->root, val, tree->nil);
 }
 
-/** 返回 val 的后继节点 */
+/** Get the successor of val */
 Node* treap_next(Treap* tree, int val) {
     return upper_bound(tree->root, val, tree->nil);
 }
 
-/** 返回 val 的后继值 */
+/** Get the successor value of val */
 int treap_next_val(Treap* tree, int val) {
     return upper_bound(tree->root, val, tree->nil)->val;
 }

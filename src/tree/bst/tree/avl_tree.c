@@ -56,19 +56,19 @@ static void update_height(Node* NIL, Node* node) {
 }
 
 /**
- * 右旋（LL 情形）
+ * Right rotation (LL case)
  *
  *        pivot                new_root
  *       /                    /        \
- *    new_root       →       b        pivot
+ *    new_root       ->       b        pivot
  *    /     \                          /
  *   b       ?                        ?
  *
- * 三步完成：
+ * Steps:
  *   1. pivot->left = b
  *   2. new_root->right = pivot
- *   3. 将 new_root 接到 pivot 的原父节点上
- *   4. 更新 pivot 和 new_root 的高度/大小（顺序不能反）
+ *   3. Attach new_root to pivot's original parent
+ *   4. Update height/size of pivot then new_root (order matters)
  */
 static void rotate_right(Node** root_ptr, Node* NIL, Node* pivot) {
     Node* new_root = pivot->left;
@@ -91,15 +91,15 @@ static void rotate_right(Node** root_ptr, Node* NIL, Node* pivot) {
 }
 
 /**
- * 左旋（RR 情形）
+ * Left rotation (RR case)
  *
  *   pivot                     new_root
  *      \                    /         \
- *     new_root      →    pivot        b
+ *     new_root      ->    pivot        b
  *        / \                \
  *       ?   b                ?
  *
- * 与右旋对称，方向相反。
+ * Mirrors right rotation, opposite direction.
  */
 static void rotate_left(Node** root_ptr, Node* NIL, Node* pivot) {
     Node* new_root = pivot->right;
@@ -232,10 +232,10 @@ static Node* upper_bound(Node* root, Node* NIL, int val) {
     Node* result = NIL;
     while (root != NIL) {
         if (root->val > val) {
-            result = root;        // 当前节点是一个候选答案
-            root = root->left;    // 尝试找更小的满足条件的节点
+            result = root;        // current node is a candidate
+            root = root->left;    // try to find a smaller matching node
         } else {
-            root = root->right;   // 当前节点太小，去右子树找
+            root = root->right;   // current node too small, go right
         }
     }
     return result;
@@ -277,10 +277,10 @@ static int find_rank(Node* NIL, Node* root, int val) {
     int rank = 0;
     while (root != NIL) {
         if (val <= root->val) {
-            // 当前节点 >= val，所以首个 val 必然在左子树，直接向左走
+            // current node >= val, rank must be in the left subtree
             root = root->left;
         } else {
-            // val > root->val，当前节点和左子树全部严格小于 val
+            // val > root->val, current node and its left subtree are all < val
             rank += root->left->size + 1;
             root = root->right;
         }
@@ -288,6 +288,7 @@ static int find_rank(Node* NIL, Node* root, int val) {
     return rank + 1;
 }
 
+/** Create an AVL tree with room for n nodes */
 AVL_Tree* avl_tree_create(int n) {
     if (n <= 0) return NULL;
 
@@ -315,6 +316,7 @@ AVL_Tree* avl_tree_create(int n) {
     return tree;
 }
 
+/** Insert a value into the AVL tree */
 void avl_tree_insert(AVL_Tree* tree, int val) {
     if (tree->idx >= tree->capacity) return;
 
@@ -335,67 +337,80 @@ void avl_tree_insert(AVL_Tree* tree, int val) {
     insert(&tree->root, tree->nil, tree->root, node);
 }
 
+/** Erase a value from the AVL tree */
 void avl_tree_erase(AVL_Tree* tree, int val) {
     if (tree->root == tree->nil) return;
     delete_val(&tree->root, tree->nil, tree->root, val);
 }
 
+/** Find a node by value */
 Node* avl_tree_find(AVL_Tree* tree, int val) {
     return find(tree->root, tree->nil, val);
 }
 
+/** Find a value and return it */
 int avl_tree_find_val(AVL_Tree* tree, int val) {
     return find(tree->root, tree->nil, val)->val;
 }
 
+/** Destroy the AVL tree and free resources */
 void avl_tree_destroy(AVL_Tree* tree) {
     if (!tree) return;
     if (tree->nodes) free(tree->nodes);
     free(tree);
 }
 
+/** Get the first node > val */
 Node* avl_tree_upper_bound(AVL_Tree* tree, int val) {
     return upper_bound(tree->root, tree->nil, val);     
 }
 
+/** Get the first node >= val */
 Node* avl_tree_lower_bound(AVL_Tree* tree, int val) {
     return lower_bound(tree->root, tree->nil, val);
 }
 
+/** Get the successor of val */
 Node* avl_tree_next(AVL_Tree* tree, int val) {
     return upper_bound(tree->root, tree->nil, val);
 }
 
+/** Get the successor value of val */
 int avl_tree_next_val(AVL_Tree* tree, int val) {
     return avl_tree_next(tree, val)->val;
 }
 
+/** Get the predecessor of val */
 Node* avl_tree_prev(AVL_Tree* tree, int val) {
     Node* cur = tree->root;
     Node* pred = tree->nil;
     while (cur != tree->nil) {
         if (cur->val < val) {
-            pred = cur;              // 当前节点是候选前驱
-            cur = cur->right;        // 找更大的
+            pred = cur;              // current node is a predecessor candidate
+            cur = cur->right;        // look for a larger candidate
         } else {
-            cur = cur->left;         // 当前节点 >= val，去左子树找更小的候选
+            cur = cur->left;         // current node >= val, go left for smaller candidate
         }
     }
     return pred;
 }
 
+/** Get the predecessor value of val */
 int avl_tree_prev_val(AVL_Tree* tree, int val) {
     return avl_tree_prev(tree, val)->val;
 }
 
+/** Get the node with rank k (1-indexed) */
 Node* avl_tree_kth(AVL_Tree* tree, int k) {
     return kth(tree->nil, tree->root, k);
 }
 
+/** Get the value with rank k (1-indexed) */
 int avl_tree_kth_val(AVL_Tree* tree, int k) {
     return avl_tree_kth(tree, k)->val;
 }
 
+/** Get the rank of val (1-indexed) */
 int avl_tree_rank(AVL_Tree* tree, int val) {
     return find_rank(tree->nil, tree->root, val);
 }
